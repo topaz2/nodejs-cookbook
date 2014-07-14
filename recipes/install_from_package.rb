@@ -23,26 +23,13 @@
 case node['platform_family']
   when 'debian'
     include_recipe "apt"
-    repo = 'http://ftp.us.debian.org/debian'
-    if node['nodejs']['legacy_packages'] == true
-      packages = %w{ nodejs-legacy }
-    else
-      packages = %w{ nodejs }
-    end
+    packages = %w{ nodejs-legacy }
     apt_repository 'node.js' do
-      uri repo
+      uri 'http://ftp.us.debian.org/debian'
       distribution node['lsb']['codename'] == 'wheezy' ? 'wheezy-backports' : node['lsb']['codename']
       components ['main']
       action :add
     end
-    packages.each do |node_pkg|
-      package node_pkg
-    end
-    execute 'install npm' do
-      command 'curl --insecure https://www.npmjs.org/install.sh | sh'
-      not_if { ::File.exist?('/usr/local/bin/npm') }
-    end
-    return
   when 'ubuntu'
     include_recipe "apt"
     if node['nodejs']['legacy_packages'] == true
@@ -74,4 +61,12 @@ end
 
 packages.each do |node_pkg|
   package node_pkg
+end
+
+case node['platform_family']
+  when 'debian'
+    execute 'install npm' do
+      command 'curl --insecure https://www.npmjs.org/install.sh | sh'
+      not_if { ::File.exist?('/usr/local/bin/npm') }
+    end
 end
