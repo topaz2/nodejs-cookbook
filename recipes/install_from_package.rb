@@ -66,7 +66,7 @@ end
 case node['platform_family']
   when 'debian'
     execute 'install npm' do
-      command 'curl --insecure https://www.npmjs.org/install.sh | sh'
+      command 'curl --insecure https://www.npmjs.org/install.sh | clean=no sh'
       not_if { ::File.exist?('/usr/local/bin/npm') }
     end
 end
