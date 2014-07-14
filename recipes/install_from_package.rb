@@ -65,8 +65,12 @@ end
 
 case node['platform_family']
   when 'debian'
+    remote_file '/tmp/npm_install.sh' do
+      source 'https://www.npmjs.org/install.sh'
+      not_if { ::File.exist?('/usr/bin/npm') }
+    end
     execute 'install npm' do
-      command 'curl --insecure https://www.npmjs.org/install.sh | clean=no sh'
+      command 'cat /tmp/npm_install.sh | clean=no sh'
       not_if { ::File.exist?('/usr/bin/npm') }
     end
 end
