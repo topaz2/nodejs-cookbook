@@ -23,6 +23,20 @@
 case node['platform_family']
   when 'debian'
     include_recipe "apt"
+    repo = 'http://ftp.us.debian.org/debian'
+    if node['nodejs']['legacy_packages'] == true
+      packages = %w{ nodejs-legacy }
+    else
+      packages = %w{ nodejs }
+    end
+    apt_repository 'node.js' do
+      uri repo
+      distribution node['lsb']['codename'] == 'wheezy' ? 'wheezy-backports' : node['lsb']['codename']
+      components ['main']
+      action :add
+    end
+  when 'ubuntu'
+    include_recipe "apt"
     if node['nodejs']['legacy_packages'] == true
       repo = 'http://ppa.launchpad.net/chris-lea/node.js-legacy/ubuntu'
       packages = %w{ nodejs npm }
