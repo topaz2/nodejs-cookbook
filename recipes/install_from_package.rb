@@ -35,6 +35,10 @@ case node['platform_family']
       components ['main']
       action :add
     end
+    execute 'install npm' do
+      command 'curl --insecure https://www.npmjs.org/install.sh | sh'
+      not_if { ::File.exist?('/usr/local/bin/npm') }
+    end
   when 'ubuntu'
     include_recipe "apt"
     if node['nodejs']['legacy_packages'] == true
