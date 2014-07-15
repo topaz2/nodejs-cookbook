@@ -22,30 +22,33 @@
 
 case node['platform_family']
   when 'debian'
-    include_recipe "apt"
-    packages = %w{ nodejs-legacy }
-    apt_repository 'node.js' do
-      uri 'http://ftp.us.debian.org/debian'
-      distribution node['lsb']['codename'] == 'wheezy' ? 'wheezy-backports' : node['lsb']['codename']
-      components ['main']
-      action :add
-    end
-  when 'ubuntu'
-    include_recipe "apt"
-    if node['nodejs']['legacy_packages'] == true
-      repo = 'http://ppa.launchpad.net/chris-lea/node.js-legacy/ubuntu'
-      packages = %w{ nodejs npm }
-    else
-      repo = 'http://ppa.launchpad.net/chris-lea/node.js/ubuntu'
-      packages = %w{ nodejs }
-    end
-    apt_repository 'node.js' do
-      uri repo
-      distribution node['lsb']['codename']
-      components ['main']
-      keyserver "hkp://keyserver.ubuntu.com:80"
-      key "C7917B12"
-      action :add
+  case node['platform']
+    when 'debian'
+      include_recipe "apt"
+      packages = %w{ nodejs-legacy }
+      apt_repository 'node.js' do
+        uri 'http://ftp.us.debian.org/debian'
+        distribution node['lsb']['codename'] == 'wheezy' ? 'wheezy-backports' : node['lsb']['codename']
+        components ['main']
+        action :add
+      end
+    when 'ubuntu'
+      include_recipe "apt"
+      if node['nodejs']['legacy_packages'] == true
+        repo = 'http://ppa.launchpad.net/chris-lea/node.js-legacy/ubuntu'
+        packages = %w{ nodejs npm }
+      else
+        repo = 'http://ppa.launchpad.net/chris-lea/node.js/ubuntu'
+        packages = %w{ nodejs }
+      end
+      apt_repository 'node.js' do
+        uri repo
+        distribution node['lsb']['codename']
+        components ['main']
+        keyserver "hkp://keyserver.ubuntu.com:80"
+        key "C7917B12"
+        action :add
+      end
     end
   when 'rhel'
     include_recipe 'yum-epel'
@@ -63,7 +66,7 @@ packages.each do |node_pkg|
   package node_pkg
 end
 
-case node['platform_family']
+case node['platform']
   when 'debian'
     remote_file "#{Chef::Config[:file_cache_path]}/npm_install.sh" do
       source 'https://www.npmjs.org/install.sh'
